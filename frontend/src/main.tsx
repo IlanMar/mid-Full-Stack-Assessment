@@ -62,7 +62,7 @@ function Simulator() {
           <button disabled={sending} onClick={() => void send(100)}>Send 100</button>
         </div>
         <p className="feedback" role="status">
-          {sending ? 'Sending…' : result ? `Sent ${result.sent} · Failed ${result.failed}` : 'Ready to send.'}
+          {sending ? 'Sending…' : result ? `Transactions sent: ${result.sent} · Send errors: ${result.failed}` : 'Ready to send.'}
         </p>
         <a href="/monitor" target="_blank" rel="noopener">Open live monitor in a new tab ↗</a>
       </section>
