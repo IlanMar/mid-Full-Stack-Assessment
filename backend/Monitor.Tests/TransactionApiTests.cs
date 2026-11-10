@@ -67,13 +67,28 @@ public class TransactionApiTests
         Assert.Equal(expected, response.StatusCode);
     }
 
-    private static object Payload(Guid id, string currency, string status) => new
+    [Theory]
+    [InlineData("2025-01-01T00:00:00Z", HttpStatusCode.Created)]
+    [InlineData("2025-01-01T00:00:00.1234567+00:00", HttpStatusCode.Created)]
+    [InlineData("2025-01-01T00:00:00", HttpStatusCode.BadRequest)]
+    [InlineData("2025-01-01", HttpStatusCode.BadRequest)]
+    [InlineData("2025-01-01T00:00:00+02:00", HttpStatusCode.BadRequest)]
+    public async Task RequiresExplicitUtcTimestamp(string timestamp, HttpStatusCode expected)
+    {
+        await using var app = new WebApplicationFactory<Program>();
+        using var client = app.CreateClient();
+        var response = await client.PostAsJsonAsync("/api/transactions",
+            Payload(Guid.NewGuid(), "USD", "Pending", timestamp));
+        Assert.Equal(expected, response.StatusCode);
+    }
+
+    private static object Payload(Guid id, string currency, string status, string timestamp = "2025-01-01T00:00:00Z") => new
     {
         transactionId = id,
         amount = 12.50m,
         currency,
         status,
-        timestamp = "2025-01-01T00:00:00Z"
+        timestamp
     };
 
     private static async Task<WebSocket> Connect(WebApplicationFactory<Program> app, CancellationToken token)

@@ -7,7 +7,7 @@ public sealed record Transaction(
     [property: JsonRequired] decimal Amount,
     [property: JsonRequired] string Currency,
     [property: JsonRequired] string Status,
-    [property: JsonRequired] DateTimeOffset Timestamp)
+    [property: JsonRequired, JsonConverter(typeof(UtcTimestampJsonConverter))] DateTimeOffset Timestamp)
 {
     public Dictionary<string, string[]> Validate()
     {

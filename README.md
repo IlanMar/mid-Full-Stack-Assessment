@@ -37,7 +37,7 @@ json
 "timestamp": "2025-01-01T00:00:00Z"
 }
 
-POST returns `201` on success, `400` for invalid input, or `409` for a duplicate ID in the current history. The monitor loads recent entries via `GET /api/transactions` and listens for `TransactionAdded` on `/hubs/transactions`.
+The timestamp must end in `Z` or `+00:00`. POST returns `201` on success, `400` for invalid input, or `409` for a duplicate ID in the current history. The monitor loads recent entries via `GET /api/transactions` and listens for `TransactionAdded` on `/hubs/transactions`.
 
 Docker and Kubernetes
 
