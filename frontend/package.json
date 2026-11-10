@@ -1,0 +1,25 @@
+{
+  "name": "transaction-monitor",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "test": "node --disable-warning=ExperimentalWarning --experimental-strip-types --test src/feed.test.ts"
+  },
+  "dependencies": {
+    "@microsoft/signalr": "^8.0.7",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "typescript": "^5.8.3",
+    "vite": "^6.4.0"
+  }
+}
