@@ -1,54 +1,49 @@
 Transaction Monitor
 
-A .NET 8 and React app for simulating transactions and watching them arrive live over SignalR. It keeps the latest 200 transactions in memory and clears them on restart.
+A .NET 8 and React app for simulating transactions and monitoring them live over SignalR. The latest 200 transactions are kept in memory until the API restarts.
 
-Run locally
+## Run locally
 
-Requires the .NET 8 SDK and Node.js 22.12+. Start the API from the repository root.
+1. Install the .NET 8 SDK and Node.js 22.12 or later.
+2. Clone the repository and open its root folder. If you already have a copy, open that folder.
 
-sh
-dotnet run --project backend/Monitor.Api --urls http://127.0.0.1:5080
+   git clone https://github.com/IlanMar/mid-Full-Stack-Assessment.git
+   cd mid-Full-Stack-Assessment
 
-Start the frontend in a second terminal, also from the repository root.
+3. Start the API from the repository root.
 
-sh
-npm --prefix frontend ci
-npm --prefix frontend run dev
+   dotnet run --project backend/Monitor.Api --urls http://127.0.0.1:5080
 
-Open two [monitor tabs](http://localhost:5173/monitor) and click **Send 100** in the [simulator](http://localhost:5173/add). Both monitors update live. Use **Errors only** to filter failed transactions.
+4. Keep the API running. In a second terminal at the repository root, install the frontend dependencies and start Vite.
 
-Tests
+   npm --prefix frontend ci
+   npm --prefix frontend run dev
 
-sh
-dotnet test backend/Monitor.Tests
-npm --prefix frontend test
-npm --prefix frontend run build
+5. Open the [monitor](http://localhost:5173/monitor) in two tabs and wait for **Live**. Click **Send 100** in the [simulator](http://localhost:5173/add). Both tabs update. Use **Errors only** to filter for failed transactions.
 
-API
+## Tests and build
 
-Example JSON body for `POST /api/transactions`.
+    dotnet test backend/Monitor.Tests
+    npm --prefix frontend test
+    npm --prefix frontend run build
 
-json
-{
-"transactionId": "e87309df-9b41-4611-9539-f9ec9559e1bd",
-"amount": 1500.50,
-"currency": "USD",
-"status": "Completed",
-"timestamp": "2025-01-01T00:00:00Z"
-}
+## API
 
-The timestamp must end in `Z` or `+00:00`. POST returns `201` on success, `400` for invalid input, or `409` for a duplicate ID in the current history. The monitor loads recent entries via `GET /api/transactions` and listens for `TransactionAdded` on `/hubs/transactions`.
+Example JSON body for `POST /api/transactions`. Use a UTC timestamp ending in `Z` or `+00:00`.
 
-Docker and Kubernetes
+    {
+      "transactionId": "e87309df-9b41-4611-9539-f9ec9559e1bd",
+      "amount": 1500.50,
+      "currency": "USD",
+      "status": "Completed",
+      "timestamp": "2025-01-01T00:00:00Z"
+    }
 
-sh
-docker build -t transaction-monitor:local .
-docker run --rm -p 8080:8080 transaction-monitor:local
+## Docker and Kubernetes
 
-Open the [container monitor](http://localhost:8080/monitor). For Kubernetes, make the image available to your cluster and apply the manifests.
+    docker build -t transaction-monitor:local .
+    docker run --rm -p 8080:8080 transaction-monitor:local
 
-sh
-kubectl apply -f k8s
-kubectl port-forward service/transaction-monitor 8080:8080
+Open the [Docker monitor](http://localhost:8080/monitor).
 
-The deployment uses one replica because history and connections live in one process. Multiple replicas would need a shared store for history and a [SignalR Redis backplane](https://learn.microsoft.com/en-us/aspnet/core/signalr/scale?view=aspnetcore-8.0) for live broadcasts.
+The Kubernetes manifests in `k8s/` use one replica. Scaling to multiple replicas would require a shared transaction store and a SignalR backplane to broadcast events across replicas.
